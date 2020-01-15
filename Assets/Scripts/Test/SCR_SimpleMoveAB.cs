@@ -6,13 +6,13 @@ using UnityEngine;
 
 public class SCR_SimpleMoveAB : MonoBehaviour
 {
-    [Tooltip("Point is relative to object's starting position")]
+    [Tooltip("Target positions, relative to object's position")]
     public Vector3 pointAOffset, pointBOffset;
 
-    [Tooltip("Time it takes to move from one point to another")]
+    [Tooltip("Seconds it takes to move between points")]
     public float movementDuration = 1;
 
-    [Tooltip("Time to wait between movements")]
+    [Tooltip("Seconds to pause after movement")]
     public float waitTime = 1;
     
     Vector3 startPos, pointA, pointB;
@@ -59,8 +59,6 @@ public class SCR_SimpleMoveAB : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.blue;
-
         Vector3 gizmoAnchor;
         if (Application.isPlaying)
         {
@@ -71,8 +69,9 @@ public class SCR_SimpleMoveAB : MonoBehaviour
             gizmoAnchor = transform.position;
         }
 
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(gizmoAnchor + pointAOffset, gizmoAnchor + pointBOffset);
         Gizmos.DrawWireSphere(gizmoAnchor + pointAOffset, 0.2f);
         Gizmos.DrawWireSphere(gizmoAnchor + pointBOffset, 0.2f);
-        Gizmos.DrawLine(gizmoAnchor + pointAOffset, gizmoAnchor + pointBOffset);
     }
 }
