@@ -15,9 +15,9 @@ public class SCR_Player : MonoBehaviour
 	}
 	#endregion
 	#region References
-	[Header("Variables:")]
-	public SCR_PlayerVar variables;
+	public SCR_Variables variables;
 	InputControls controls;
+	CharacterController charController;
 	#endregion
 
 	#region Local Variables
@@ -25,13 +25,15 @@ public class SCR_Player : MonoBehaviour
 	float currentSpeed;
 	float rotationVelocity, speedVelocity;
 	Transform camT;
+	float yVelocity;
 	#endregion
 
 	private void Awake()
 	{
 		//REF:
-		camT = Camera.main.transform;
+		camT = GameObject.FindGameObjectWithTag("PlayerCam").transform;
 		controls = new InputControls();
+		charController = GetComponent<CharacterController>();
 
 		//Functions:
 		InputActions();
@@ -52,20 +54,43 @@ public class SCR_Player : MonoBehaviour
 		if (input != Vector2.zero)
 		{
 			float targetRotation = Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + camT.eulerAngles.y;
-			transform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity, variables.smoothTurning);
+			transform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity, ModifiedSmoothTime(variables.playerTurnSpeed));
 		}
 
 		//Check if Running & Set Speed Accordingly:
 		float targetSpeed = (running ? variables.runSpeed : variables.walkSpeed) * input.magnitude;
-		currentSpeed = Mathf.SmoothDamp(currentSpeed, targetSpeed, ref speedVelocity, variables.Acceleration);
+		currentSpeed = Mathf.SmoothDamp(currentSpeed, targetSpeed, ref speedVelocity, ModifiedSmoothTime(variables.Acceleration));
+
+		//Add Gravity:
+		yVelocity += Time.deltaTime * variables.gravity;
 
 		//Move the Player:
-		transform.Translate(transform.forward * currentSpeed * Time.deltaTime, Space.World);
+		Vector3 velocity = transform.forward * currentSpeed + Vector3.up * yVelocity;
+		charController.Move(velocity * Time.deltaTime);
+
+		//Reset Y Velocity When Grounded:
+		if(charController.isGrounded)
+		{
+			yVelocity = 0;
+		}
 	}
 
 	void Jump()
 	{
-		
+		if(charController.isGrounded)
+		{
+			float jumpVelocity = Mathf.Sqrt(-2 * variables.gravity * variables.jumpHeight);
+			yVelocity = jumpVelocity;
+		}
+	}
+
+	float ModifiedSmoothTime(float smoothTime)
+	{
+		if (charController.isGrounded)
+			return smoothTime;
+		if (variables.airControlPercent == 0)
+			return float.MaxValue;
+		return smoothTime / variables.airControlPercent;
 	}
 
 	void InputActions()

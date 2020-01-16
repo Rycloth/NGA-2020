@@ -15,7 +15,7 @@ public class SCR_CamControl : MonoBehaviour
 	}
 	#endregion
 	#region References
-	public SCR_CamVar variables;
+	public SCR_Variables variables;
 	public Transform lookTarget;
 	InputControls controls;
 	#endregion
@@ -37,7 +37,7 @@ public class SCR_CamControl : MonoBehaviour
 		pitch -= input.y * variables.sensitivity;
 		pitch = Mathf.Clamp(pitch, variables.pitchMinMax.x, variables.pitchMinMax.y);
 
-		currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref smoothVelocity, variables.smoothTurning);
+		currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref smoothVelocity, variables.camTurnSpeed);
 		transform.eulerAngles = currentRotation;
 
 		transform.position = lookTarget.position - transform.forward * variables.distanceFromTarget;
