@@ -17,6 +17,7 @@ public class SCR_SimpleMoveAB : MonoBehaviour
     
     Vector3 startPos, pointA, pointB;
     bool movementStarted = false;
+    MeshCollider mc;
 
     void Start()
     {
@@ -73,5 +74,58 @@ public class SCR_SimpleMoveAB : MonoBehaviour
         Gizmos.DrawLine(gizmoAnchor + pointAOffset, gizmoAnchor + pointBOffset);
         Gizmos.DrawWireSphere(gizmoAnchor + pointAOffset, 0.2f);
         Gizmos.DrawWireSphere(gizmoAnchor + pointBOffset, 0.2f);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        // DrawOffsetMesh is poorly optimized, so it's only done when object is selected
+
+        Vector3 gizmoAnchor;
+        if (Application.isPlaying)
+        {
+            gizmoAnchor = startPos;
+        }
+        else
+        {
+            gizmoAnchor = transform.position;
+        }
+
+        DrawOffsetMesh(pointAOffset, gizmoAnchor);
+        DrawOffsetMesh(pointBOffset, gizmoAnchor);
+    }
+
+    private void DrawOffsetMesh(Vector3 offset, Vector3 anchor)
+    {
+        Gizmos.color = Color.black;
+
+        var m = Gizmos.matrix;
+
+        if(mc == null)
+        {
+            mc = GetComponentInChildren<MeshCollider>();
+        }
+
+        var g = new GameObject();
+        var t = g.transform;
+
+        t.position = anchor + mc.transform.localPosition;
+        t.rotation = mc.transform.rotation;
+        t.localScale = mc.transform.localScale;
+
+        t.position += offset;
+
+        Gizmos.matrix = t.localToWorldMatrix;
+
+        Gizmos.DrawWireMesh(GetComponentInChildren<MeshCollider>().sharedMesh);
+        DestroyImmediate(g);
+
+        Gizmos.matrix = m;
+    }
+
+    // Mesh for gizmo must be updated manually
+    [ContextMenu("Update Mesh")]
+    void UpdateMesh()
+    {
+        mc = GetComponentInChildren<MeshCollider>();
     }
 }
