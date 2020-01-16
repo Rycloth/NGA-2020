@@ -16,18 +16,21 @@ public class SCR_Player : MonoBehaviour
 	#endregion
 	#region References
 	[Header("Variables:")]
-	public SCR_Variables variables;
+	public SCR_PlayerVar variables;
 	InputControls controls;
 	#endregion
 
 	#region Local Variables
-	float movementSpeed = 3;
 	bool running;
+	float currentSpeed;
+	float rotationVelocity, speedVelocity;
+	Transform camT;
 	#endregion
 
 	private void Awake()
 	{
 		//REF:
+		camT = Camera.main.transform;
 		controls = new InputControls();
 
 		//Functions:
@@ -42,22 +45,27 @@ public class SCR_Player : MonoBehaviour
 
 	void Move()
 	{
+		//Get Player Input:
 		Vector2 input = controls.Player.Movement.ReadValue<Vector2>();
 
+		//If Input then set Target Rotation & Smoothly Rotate in Degrees:
 		if (input != Vector2.zero)
 		{
-			transform.eulerAngles = Vector3.up * Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg;
+			float targetRotation = Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + camT.eulerAngles.y;
+			transform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity, variables.smoothTurning);
 		}
 
-		movementSpeed = running ? variables.runSpeed : variables.walkSpeed;
-		movementSpeed *= input.magnitude;
+		//Check if Running & Set Speed Accordingly:
+		float targetSpeed = (running ? variables.runSpeed : variables.walkSpeed) * input.magnitude;
+		currentSpeed = Mathf.SmoothDamp(currentSpeed, targetSpeed, ref speedVelocity, variables.Acceleration);
 
-		transform.Translate(transform.forward * movementSpeed * Time.deltaTime, Space.World);
+		//Move the Player:
+		transform.Translate(transform.forward * currentSpeed * Time.deltaTime, Space.World);
 	}
 
 	void Jump()
 	{
-		print("I am Jumping");
+		
 	}
 
 	void InputActions()

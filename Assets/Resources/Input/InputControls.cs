@@ -49,6 +49,14 @@ public class @InputControls : IInputActionCollection, IDisposable
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Camera"",
+                    ""type"": ""Value"",
+                    ""id"": ""671a6f4d-9793-4534-90a5-06fd9bc549e6"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -95,6 +103,17 @@ public class @InputControls : IInputActionCollection, IDisposable
                     ""action"": ""Hold to Run"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""95fd0c94-4559-44dd-a6f5-652d14ba3e90"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Camera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -107,6 +126,7 @@ public class @InputControls : IInputActionCollection, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_PresstoRun = m_Player.FindAction("Press to Run", throwIfNotFound: true);
         m_Player_HoldtoRun = m_Player.FindAction("Hold to Run", throwIfNotFound: true);
+        m_Player_Camera = m_Player.FindAction("Camera", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -160,6 +180,7 @@ public class @InputControls : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_PresstoRun;
     private readonly InputAction m_Player_HoldtoRun;
+    private readonly InputAction m_Player_Camera;
     public struct PlayerActions
     {
         private @InputControls m_Wrapper;
@@ -168,6 +189,7 @@ public class @InputControls : IInputActionCollection, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @PresstoRun => m_Wrapper.m_Player_PresstoRun;
         public InputAction @HoldtoRun => m_Wrapper.m_Player_HoldtoRun;
+        public InputAction @Camera => m_Wrapper.m_Player_Camera;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -189,6 +211,9 @@ public class @InputControls : IInputActionCollection, IDisposable
                 @HoldtoRun.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnHoldtoRun;
                 @HoldtoRun.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnHoldtoRun;
                 @HoldtoRun.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnHoldtoRun;
+                @Camera.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCamera;
+                @Camera.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCamera;
+                @Camera.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCamera;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -205,6 +230,9 @@ public class @InputControls : IInputActionCollection, IDisposable
                 @HoldtoRun.started += instance.OnHoldtoRun;
                 @HoldtoRun.performed += instance.OnHoldtoRun;
                 @HoldtoRun.canceled += instance.OnHoldtoRun;
+                @Camera.started += instance.OnCamera;
+                @Camera.performed += instance.OnCamera;
+                @Camera.canceled += instance.OnCamera;
             }
         }
     }
@@ -215,5 +243,6 @@ public class @InputControls : IInputActionCollection, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnPresstoRun(InputAction.CallbackContext context);
         void OnHoldtoRun(InputAction.CallbackContext context);
+        void OnCamera(InputAction.CallbackContext context);
     }
 }
