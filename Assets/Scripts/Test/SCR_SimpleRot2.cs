@@ -18,6 +18,8 @@ public class SCR_SimpleRot2 : MonoBehaviour
 
 	void FixedUpdate()
     {
+		Quaternion deltaRotation = Quaternion.Euler(rotation * Time.deltaTime);
+		rb.MoveRotation(transform.rotation * deltaRotation);
         //transform.Rotate(rotation * Time.deltaTime, rotationSpace);
     }
 }

@@ -44,6 +44,7 @@ public class SCR_PlayerV2 : MonoBehaviour
 		Move();
 	}
 
+
 	void Move()
 	{
 		//Get Player Input:
